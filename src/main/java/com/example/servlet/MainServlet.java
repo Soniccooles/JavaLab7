@@ -35,7 +35,6 @@ public class MainServlet extends HttpServlet {
         req.setAttribute("files", files);
         req.setAttribute("creationDate", creationDate);
         req.setAttribute("parentDir", parentDir);
-        dir.lastModified().
         req.getRequestDispatcher("mypage.jsp").forward(req, resp);
     }
 
