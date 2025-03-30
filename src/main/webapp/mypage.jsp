@@ -1,8 +1,7 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.util.Date" %>
 <html>
 <head>
     <title>Java Servlet App</title>

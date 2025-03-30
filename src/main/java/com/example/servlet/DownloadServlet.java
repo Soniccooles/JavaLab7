@@ -26,7 +26,6 @@ public class DownloadServlet extends HttpServlet {
         resp.setContentType("APPLICATION/OCTET-STREAM");
         resp.setHeader("Content-Disposition", "attachment; filename=\"" +  encodedFileName + "\"");
 
-        int i;
         try (FileInputStream fileInputStream = new FileInputStream(file);
              OutputStream outputStream = resp.getOutputStream()) {
 
