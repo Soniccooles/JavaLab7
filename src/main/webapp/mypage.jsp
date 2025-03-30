@@ -38,7 +38,11 @@
                     </c:choose>
                 </td>
                 <td>${file.length()} байт</td>
-                <td>${file.lastModified()}</td>
+                <td>
+                    <jsp:useBean id="dateValue" class="java.util.Date"/>
+                    <jsp:setProperty name="dateValue" property="time" value="${file.lastModified()}"/>
+                    <fmt:formatDate value="${dateValue}" pattern="MM/dd/yyyy HH:mm"/>
+                </td>
             </tr>
         </c:forEach>
         </tbody>
