@@ -11,9 +11,13 @@
     <h3 class="crDate">${creationDate}</h3>
     <h1 class="currentDir">${currentDir}</h1>
 
+    <form action="logout" method="post">
+        <input type="submit" value="Выйти">
+    </form>
     <c:if test="${not empty parentDir}">
         <a href="files?path=${URLEncoder.encode(parentDir, 'UTF-8')}">Наверх</a>
     </c:if>
+
 
     <table>
         <thead>
