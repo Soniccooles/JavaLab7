@@ -2,23 +2,23 @@ package com.example.accounts;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+
 import com.example.DBService.DBService;
 
 
-public class AccountService {
+public class AccountService implements AutoCloseable {
     private final DBService dbService;
     public static final String ACCOUNT_SERVICE_ATTRIBUTE = "accountService";
 
 
     public AccountService() {
-        try {
-            this.dbService = new DBService();
-            if (dbService.getUserByLogin("admin") == null) {
+        this.dbService = new DBService();
+        InitializeAdminUser();
+    }
 
-                addNewUser(new UserProfile("admin", "admin2", "admin@example.com"));
-            }
-        } catch (SQLException ex) {
-            throw new RuntimeException("AccountService: Failed to initialize DBService class", ex);
+    public void InitializeAdminUser() {
+        if (dbService.getUserByName("admin") == null) {
+            dbService.addUser(new UserProfile("admin", "admin2", "admin@example.com"));
         }
     }
 
@@ -47,22 +47,22 @@ public class AccountService {
         try {
             dbService.addUser(profile);
             createTestFilesStructure(profile.getLogin());
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to add user", e);
+        } catch (Exception e) {
+            throw new RuntimeException("[AccountService] Failed to add user", e);
         }
     }
 
     public UserProfile getUserByLogin(String login) {
         try {
-            return dbService.getUserByLogin(login);
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to get user", e);
+            return dbService.getUserByName(login);
+        } catch (Exception e) {
+            throw new RuntimeException("[AccountService] Failed to get user", e);
         }
     }
 
     public boolean checkUser(String login, String password) {
-        UserProfile profile = getUserByLogin(login);
-        return profile != null && profile.getPassword().equals(password);
+        UserProfile user = getUserByLogin(login);
+        return user != null && user.getPassword().equals(password);
     }
 
     private void createTestFilesStructure(String login) {
@@ -91,6 +91,13 @@ public class AccountService {
         if (!file.exists()) {
             file.createNewFile();
             java.nio.file.Files.write(file.toPath(), content.getBytes());
+        }
+    }
+
+    @Override
+    public void close() throws SQLException {
+        if (dbService != null) {
+            dbService.close();
         }
     }
 }
