@@ -1,17 +1,25 @@
 package com.example.accounts;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.SQLException;
+import com.example.DBService.DBService;
 
 
 public class AccountService {
-    private final Map<String, UserProfile> loginToProfile;
+    private final DBService dbService;
     public static final String ACCOUNT_SERVICE_ATTRIBUTE = "accountService";
 
+
     public AccountService() {
-        loginToProfile = new HashMap<>();
-        addNewUser(new UserProfile("admin", "admin2", "admin@example.com"));
+        try {
+            this.dbService = new DBService();
+            if (dbService.getUserByLogin("admin") == null) {
+
+                addNewUser(new UserProfile("admin", "admin2", "admin@example.com"));
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException("AccountService: Failed to initialize DBService class", ex);
+        }
     }
 
     public String getUserHomeDir(String login) {
@@ -36,16 +44,24 @@ public class AccountService {
     }
 
     public void addNewUser(UserProfile profile) {
-        loginToProfile.put(profile.getLogin(), profile);
-        createTestFilesStructure(profile.getLogin());
+        try {
+            dbService.addUser(profile);
+            createTestFilesStructure(profile.getLogin());
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to add user", e);
+        }
     }
 
     public UserProfile getUserByLogin(String login) {
-        return loginToProfile.get(login);
+        try {
+            return dbService.getUserByLogin(login);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get user", e);
+        }
     }
 
     public boolean checkUser(String login, String password) {
-        UserProfile profile = loginToProfile.get(login);
+        UserProfile profile = getUserByLogin(login);
         return profile != null && profile.getPassword().equals(password);
     }
 

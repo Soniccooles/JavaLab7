@@ -1,5 +1,6 @@
 package com.example.servlet;
 
+import com.example.DBService.DBService;
 import com.example.accounts.AccountService;
 import com.example.accounts.UserProfile;
 import jakarta.servlet.ServletException;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import jakarta.servlet.http.HttpSession;
@@ -18,6 +20,7 @@ public class MainServlet extends HttpServlet {
     private AccountService accountService;
     @Override
     public void init() throws ServletException {
+
         accountService = (AccountService) getServletContext().getAttribute(AccountService.ACCOUNT_SERVICE_ATTRIBUTE);
         if (accountService == null) {
             accountService = new AccountService();
@@ -27,7 +30,6 @@ public class MainServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
         HttpSession session = req.getSession(false);
 
         if (session == null || session.getAttribute("user") == null) {
@@ -38,8 +40,7 @@ public class MainServlet extends HttpServlet {
         UserProfile profile = (UserProfile) session.getAttribute("user");
         String homeDir = accountService.getUserHomeDir(profile.getLogin());
         String requestedPath = req.getParameter("path");
-
-        if (requestedPath == null || !requestedPath.startsWith(homeDir)) {
+        if (requestedPath == null || !Paths.get(requestedPath).normalize().startsWith(homeDir)) {
             requestedPath = homeDir;
         }
 
@@ -53,6 +54,9 @@ public class MainServlet extends HttpServlet {
         System.out.println("Parent dir: " + parentDir);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         String creationDate = dateFormat.format(new Date());
+        if (parentDir != null && !Paths.get(parentDir).normalize().startsWith(homeDir)) {
+            parentDir = homeDir;
+        }
 
         req.setAttribute("currentDir", dir.getAbsolutePath());
         req.setAttribute("files", files);
